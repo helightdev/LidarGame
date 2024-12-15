@@ -7,11 +7,10 @@ namespace Behaviours {
         public static PointRaycaster Instance { get; private set; }
 
         private void Awake() {
-            if (Instance == null) {
+            if (Instance == null)
                 Instance = this;
-            } else {
+            else
                 Destroy(gameObject);
-            }
         }
 
 
@@ -27,11 +26,10 @@ namespace Behaviours {
 
         public void Raycast(Vector3 position, Vector3 direction) {
             if (Physics.Raycast(position, direction, out var hit, 1000, mask)) {
-                if (hit.collider.TryGetComponent<LidarEnvironment>(out var environment)) {
+                if (hit.collider.TryGetComponent<LidarEnvironment>(out var environment))
                     environment.HandleRaycastHit(hit.point);
-                } else {
+                else
                     Debug.Log("No LidarEnvironment found");
-                }
             }
         }
     }

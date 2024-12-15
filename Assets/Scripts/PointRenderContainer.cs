@@ -51,19 +51,13 @@ public class PointRenderContainer : MonoBehaviour {
     }
 
     private void Update() {
-        if (_scheduledInsertData.Length > 0 && _insertionRateLimiter.Limit()) {
-            InsertionTask().Forget();
-        }
+        if (_scheduledInsertData.Length > 0 && _insertionRateLimiter.Limit()) InsertionTask().Forget();
 
-        if (dirty && _rebuildRateLimiter.Limit()) {
-            CopyTask().Forget();
-        }
+        if (dirty && _rebuildRateLimiter.Limit()) CopyTask().Forget();
     }
 
     private void FixedUpdate() {
-        if (_cleanupRateLimiter.Limit()) {
-            CleanupTask().Forget();
-        }
+        if (_cleanupRateLimiter.Limit()) CleanupTask().Forget();
 
         if (referenceTransform) {
             var transformPosition = referenceTransform.position;
@@ -101,9 +95,7 @@ public class PointRenderContainer : MonoBehaviour {
 
         await _treeLock.EnterWriteLockAsync();
         try {
-            if (temp.Length == 0) {
-                return;
-            }
+            if (temp.Length == 0) return;
 
             var job = new TreeInsertJob {
                 data = insertions,
@@ -135,9 +127,7 @@ public class PointRenderContainer : MonoBehaviour {
             stopwatch.Stop();
             // Debug.Log($"Cleanup took {stopwatch.ElapsedMilliseconds}ms, removed {lengthBefore - lengthAfter} points");
 
-            if (lengthAfter != lengthBefore) {
-                dirty = true;
-            }
+            if (lengthAfter != lengthBefore) dirty = true;
         } catch (Exception e) {
             Debug.LogException(e);
         } finally {
@@ -203,16 +193,15 @@ public class PointRenderContainer : MonoBehaviour {
 
     private async UniTask MirrorTreeToEntries() {
         var entryCount = math.ceil(tree.points.Length / (float)TEXTURE_2D_MAX_HEIGHT);
-        if (entryCount > _renderEntries.Length) {
+        if (entryCount > _renderEntries.Length)
             for (var i = _renderEntries.Length; i < entryCount; i++)
                 CreateRenderEntry();
-        } else if (entryCount < _renderEntries.Length) {
+        else if (entryCount < _renderEntries.Length)
             for (var i = _renderEntries.Length - 1; i >= entryCount; i--) {
                 var entry = _renderEntries[i];
                 entry.Dispose();
                 _renderEntries.RemoveAtSwapBack(i);
             }
-        }
 
         var stopwatch = Stopwatch.StartNew();
         var job = new MirrorTreeToVfxJob {
@@ -221,11 +210,9 @@ public class PointRenderContainer : MonoBehaviour {
         };
         if (entryCount <= 2)
             // Maybe make some of those framerate dependent
-        {
             job.Run();
-        } else {
+        else
             await job.Schedule();
-        }
 
         stopwatch.Stop();
         // Debug.Log($"Mirror took {stopwatch.ElapsedMilliseconds}ms");

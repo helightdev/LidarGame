@@ -13,9 +13,7 @@ namespace Jobs {
         public UnsafeList<PointRenderEntry> entries;
 
         public void Execute() {
-            if (tree.points.Length == 0) {
-                return;
-            }
+            if (tree.points.Length == 0) return;
 
             // Set count to 0 for all entries
             for (var i = 0; i < entries.Length; i++) {
@@ -28,7 +26,7 @@ namespace Jobs {
             var currentEntry = entries[currentIndex];
             var cursor = 0;
             var bounds = new MinMaxAABB();
-            
+
             var iter = tree.TraverseLeftToRightIterative(Allocator.Temp);
             foreach (var point in iter) {
                 if (cursor == PointRenderContainer.TEXTURE_2D_MAX_HEIGHT) {
@@ -42,26 +40,25 @@ namespace Jobs {
                     cursor = 0;
                 }
 
-                if (cursor == 0) {
+                if (cursor == 0)
                     bounds = new MinMaxAABB(point.position, point.position);
-                } else {
+                else
                     bounds.Encapsulate(point.position);
-                }
 
                 currentEntry.data[cursor] = new float4(point.position, 1f);
                 currentEntry.data[cursor + PointRenderContainer.TEXTURE_2D_MAX_HEIGHT] =
                     new float4(point.color, point.timestamp);
                 cursor++;
             }
+
             iter.Dispose();
 
-            if (cursor > 0) {
+            if (cursor > 0)
                 entries[currentIndex] = new PointRenderEntry {
                     data = currentEntry.data,
                     count = (uint)cursor,
                     bounds = bounds
                 };
-            }
         }
     }
 }

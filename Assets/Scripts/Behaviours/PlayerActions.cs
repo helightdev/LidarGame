@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Debug = UnityEngine.Debug;
 
 namespace Behaviours {
     public class PlayerActions : MonoBehaviour {

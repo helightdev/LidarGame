@@ -141,9 +141,8 @@ namespace Jobs {
 
             public void Execute() {
                 foreach (var pointData in from)
-                    if (time - pointData.timestamp < maxLifetime) {
+                    if (time - pointData.timestamp < maxLifetime)
                         to.Add(pointData);
-                    }
             }
         }
 

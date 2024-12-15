@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Unity.Burst;
 using Unity.Collections;
@@ -38,18 +37,15 @@ namespace Common {
             var pointIndex = points.Length;
             points.Add(point);
 
-            if (nodes.Length == 0) {
+            if (nodes.Length == 0)
                 nodes.Add(new KdTreeNode(pointIndex));
-            } else {
+            else
                 Insert(0, pointIndex, 0);
-            }
         }
-        
+
         public NativeList<PointData> TraverseLeftToRightIterative(Allocator allocator) {
             var data = new NativeList<PointData>(points.Length, allocator);
-            if (nodes.Length == 0) {
-                return data;
-            }
+            if (nodes.Length == 0) return data;
 
             var stack = new NativeList<int>(Allocator.Temp);
             try {
@@ -57,15 +53,14 @@ namespace Common {
                 while (stack.Length > 0) {
                     var nodeIndex = stack[^1];
                     stack.RemoveAt(stack.Length - 1);
-                    if (nodeIndex == -1) {
-                        continue;
-                    }
+                    if (nodeIndex == -1) continue;
 
                     var node = nodes[nodeIndex];
                     stack.Add(node.Right);
                     stack.Add(node.Left);
                     data.Add(points[node.PointIndex]);
                 }
+
                 return data;
             } finally {
                 stack.Dispose();
@@ -103,17 +98,13 @@ namespace Common {
         }
 
         public int FindNearest(float3 target) {
-            if (nodes.Length == 0) {
-                return -1;
-            }
+            if (nodes.Length == 0) return -1;
 
             return FindNearest(0, target, 0, -1);
         }
 
         private int FindNearest(int nodeIndex, float3 target, int depth, int bestIndex) {
-            if (nodeIndex == -1) {
-                return bestIndex;
-            }
+            if (nodeIndex == -1) return bestIndex;
 
             var node = nodes[nodeIndex];
             var nodePoint = points[node.PointIndex];
@@ -122,9 +113,7 @@ namespace Common {
             var currentDistance = math.distance(target, nodePoint.position);
 
             var nextBestIndex = bestIndex;
-            if (currentDistance < bestDistance) {
-                nextBestIndex = node.PointIndex;
-            }
+            if (currentDistance < bestDistance) nextBestIndex = node.PointIndex;
 
             var axis = depth % 3;
             var nextNode = ComparePoints(target, nodePoint.position, axis) < 0 ? node.Left : node.Right;
@@ -133,9 +122,8 @@ namespace Common {
             nextBestIndex = FindNearest(nextNode, target, depth + 1, nextBestIndex);
 
             var axisDistance = math.abs(GetCoordinate(target, axis) - GetCoordinate(nodePoint.position, axis));
-            if (axisDistance < math.distance(target, points[nextBestIndex].position)) {
+            if (axisDistance < math.distance(target, points[nextBestIndex].position))
                 nextBestIndex = FindNearest(otherNode, target, depth + 1, nextBestIndex);
-            }
 
             return nextBestIndex;
         }
@@ -165,18 +153,14 @@ namespace Common {
         }
 
         private int GetMaxDepth(int nodeIndex) {
-            if (nodeIndex == -1) {
-                return 0;
-            }
+            if (nodeIndex == -1) return 0;
 
             var node = nodes[nodeIndex];
             return 1 + math.max(GetMaxDepth(node.Left), GetMaxDepth(node.Right));
         }
 
         public float GetAverageDepth() {
-            if (nodes.Length == 0) {
-                return 0;
-            }
+            if (nodes.Length == 0) return 0;
 
             var totalDepth = 0;
             var nodeCount = 0;
@@ -185,9 +169,7 @@ namespace Common {
         }
 
         private void GetDepths(int nodeIndex, int currentDepth, ref int totalDepth, ref int nodeCount) {
-            if (nodeIndex == -1) {
-                return;
-            }
+            if (nodeIndex == -1) return;
 
             totalDepth += currentDepth;
             nodeCount++;

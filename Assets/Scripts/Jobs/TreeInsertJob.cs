@@ -12,8 +12,7 @@ namespace Jobs {
         public KdTree tree;
 
         public void Execute() {
-            for (var i = 0; i < data.Length; i++) {
-                var d = data[i];
+            foreach (var d in data)
                 if (d.isUpdate) {
                     var point = tree.points[d.updateIndex];
                     point.timestamp = d.timestamp;
@@ -25,7 +24,6 @@ namespace Jobs {
                         timestamp = d.timestamp
                     });
                 }
-            }
         }
     }
 

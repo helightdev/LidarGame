@@ -66,12 +66,11 @@ namespace Common {
                 }
             }
 
-            if (nextWriter != null) {
+            if (nextWriter != null)
                 nextWriter.TrySetResult(true);
-            } else if (readyReaders != null) {
+            else if (readyReaders != null)
                 foreach (var reader in readyReaders)
                     reader.TrySetResult(true);
-            }
         }
     }
 }

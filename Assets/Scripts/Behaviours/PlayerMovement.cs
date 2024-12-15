@@ -49,17 +49,13 @@ namespace Behaviours {
         }
 
         public void Jump() {
-            if (!characterController.isGrounded) {
-                return;
-            }
+            if (!characterController.isGrounded) return;
 
             _upwardMotion = verticalJumpSpeed;
         }
 
         private void SetUpwardMotion(float deltaTime) {
-            if (characterController.isGrounded && !IsJumping) {
-                _upwardMotion = 0;
-            }
+            if (characterController.isGrounded && !IsJumping) _upwardMotion = 0;
 
             _upwardMotion -= gravity * deltaTime;
         }
