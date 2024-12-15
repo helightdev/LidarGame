@@ -14,7 +14,10 @@ namespace Common {
         }
 
         public bool Limit() {
-            if (Time.time < _nextTime) return false;
+            if (Time.time < _nextTime) {
+                return false;
+            }
+
             _nextTime = Time.time + _rate;
             return true;
         }

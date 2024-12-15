@@ -14,8 +14,9 @@ namespace Jobs {
             var buffer = new NativeList<PointData>(tree.points.Length, Allocator.Temp);
 
             foreach (var point in tree.points)
-                if (currentTime - point.timestamp < maxAge)
+                if (currentTime - point.timestamp < maxAge) {
                     buffer.Add(point);
+                }
 
             if (buffer.Length != tree.points.Length) {
                 tree.points.Clear();

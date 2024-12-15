@@ -13,7 +13,9 @@ namespace Jobs {
         public UnsafeList<PointRenderEntry> entries;
 
         public void Execute() {
-            if (tree.points.Length == 0) return;
+            if (tree.points.Length == 0) {
+                return;
+            }
 
             // Set count to 0 for all entries
             for (var i = 0; i < entries.Length; i++) {
