@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Unity.Burst;
 using Unity.Collections;
@@ -37,10 +38,34 @@ namespace Common {
             var pointIndex = points.Length;
             points.Add(point);
 
-            if (nodes.Length == 0)
+            if (nodes.Length == 0) {
                 nodes.Add(new KdTreeNode(pointIndex));
-            else
+            } else {
                 Insert(0, pointIndex, 0);
+            }
+        }
+        
+        public NativeList<PointData> TraverseLeftToRightIterative(Allocator allocator) {
+            var data = new NativeList<PointData>(points.Length, allocator);
+            if (nodes.Length == 0) return data;
+
+            var stack = new NativeList<int>(Allocator.Temp);
+            try {
+                stack.Add(0);
+                while (stack.Length > 0) {
+                    var nodeIndex = stack[^1];
+                    stack.RemoveAt(stack.Length - 1);
+                    if (nodeIndex == -1) continue;
+
+                    var node = nodes[nodeIndex];
+                    stack.Add(node.Right);
+                    stack.Add(node.Left);
+                    data.Add(points[node.PointIndex]);
+                }
+                return data;
+            } finally {
+                stack.Dispose();
+            }
         }
 
         private void Insert(int nodeIndex, int pointIndex, int depth) {

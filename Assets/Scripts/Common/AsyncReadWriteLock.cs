@@ -23,7 +23,7 @@ namespace Common {
         }
 
         public void ExitReadLock() {
-            UniTaskCompletionSource<bool>? nextWriter = null;
+            UniTaskCompletionSource<bool> nextWriter = null;
             lock (this) {
                 _readerCount--;
                 if (_readerCount == 0 && _writeWaiters.Count > 0) {
@@ -49,8 +49,8 @@ namespace Common {
         }
 
         public void ExitWriteLock() {
-            List<UniTaskCompletionSource<bool>>? readyReaders = null;
-            UniTaskCompletionSource<bool>? nextWriter = null;
+            List<UniTaskCompletionSource<bool>> readyReaders = null;
+            UniTaskCompletionSource<bool> nextWriter = null;
 
             lock (this) {
                 _isWriterActive = false;

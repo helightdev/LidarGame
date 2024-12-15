@@ -26,7 +26,9 @@ namespace Jobs {
             var currentEntry = entries[currentIndex];
             var cursor = 0;
             var bounds = new MinMaxAABB();
-            foreach (var point in tree.points) {
+            
+            var iter = tree.TraverseLeftToRightIterative(Allocator.Temp);
+            foreach (var point in iter) {
                 if (cursor == PointRenderContainer.TEXTURE_2D_MAX_HEIGHT) {
                     entries[currentIndex] = new PointRenderEntry {
                         data = currentEntry.data,
@@ -38,23 +40,26 @@ namespace Jobs {
                     cursor = 0;
                 }
 
-                if (cursor == 0)
+                if (cursor == 0) {
                     bounds = new MinMaxAABB(point.position, point.position);
-                else
+                } else {
                     bounds.Encapsulate(point.position);
+                }
 
                 currentEntry.data[cursor] = new float4(point.position, 1f);
                 currentEntry.data[cursor + PointRenderContainer.TEXTURE_2D_MAX_HEIGHT] =
                     new float4(point.color, point.timestamp);
                 cursor++;
             }
+            iter.Dispose();
 
-            if (cursor > 0)
+            if (cursor > 0) {
                 entries[currentIndex] = new PointRenderEntry {
                     data = currentEntry.data,
                     count = (uint)cursor,
                     bounds = bounds
                 };
+            }
         }
     }
 }
