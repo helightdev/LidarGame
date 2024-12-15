@@ -1,24 +1,26 @@
 using System;
+using Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace DefaultNamespace {
-    
+namespace Behaviours {
     public enum LidarColorMode {
         Solid,
         Gradient
     }
+
     public class LidarEnvironment : MonoBehaviour {
         public PointRenderContainer container;
-        [ColorUsage(false, true)]
-        public Color color;
+
+        [ColorUsage(false, true)] public Color color;
+
         public float density = 0.05f;
-        
-        [GradientUsage(true)]
-        public Gradient gradient;
+
+        [GradientUsage(true)] public Gradient gradient;
+
         public LidarColorMode colorMode = LidarColorMode.Solid;
-        
+
         public Color SampleColor() {
             return colorMode switch {
                 LidarColorMode.Solid => color,
@@ -38,7 +40,7 @@ namespace DefaultNamespace {
                 }
             }
         }
-        
+
         public void HandleRaycastHit(Vector3 point) {
             var c = SampleColor();
             container.ScheduleInsertData(new PointInsertData {
@@ -48,7 +50,7 @@ namespace DefaultNamespace {
                 timestamp = Time.time
             });
         }
-        
+
         private static Vector3 SamplePointOnMesh(Mesh mesh) {
             var triangles = mesh.triangles;
             var index = Mathf.FloorToInt(Random.value * (triangles.Length / 3f));
