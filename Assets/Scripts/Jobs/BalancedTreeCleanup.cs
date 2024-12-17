@@ -14,7 +14,7 @@ namespace Jobs {
     public static class BalancedTreeCleanup {
         public static async UniTask<KdTree> BalanceAndCleanup(NativeList<PointData> points, int samples,
             float maxLifetime) {
-            var available = new NativeList<PointData>(points.Length, Allocator.TempJob);
+            var available = new NativeList<PointData>(points.Length, Allocator.Persistent);
 
             new CopyAndFilter {
                 from = points,
@@ -24,7 +24,7 @@ namespace Jobs {
             }.Run();
 
             var effectiveCount = math.min(available.Length, samples);
-            var data = new NativeList<PointData>(effectiveCount, Allocator.TempJob);
+            var data = new NativeList<PointData>(effectiveCount, Allocator.Persistent);
 
             KdTree tree;
             try {
@@ -58,9 +58,9 @@ namespace Jobs {
             }
 
             var stopwatch = Stopwatch.StartNew();
-            var xyz = new NativeList<PointData>(points.Length, Allocator.TempJob);
-            var yzx = new NativeList<PointData>(points.Length, Allocator.TempJob);
-            var zxy = new NativeList<PointData>(points.Length, Allocator.TempJob);
+            var xyz = new NativeList<PointData>(points.Length, Allocator.Persistent);
+            var yzx = new NativeList<PointData>(points.Length, Allocator.Persistent);
+            var zxy = new NativeList<PointData>(points.Length, Allocator.Persistent);
             foreach (var data in points) {
                 xyz.Add(data);
                 yzx.Add(data);
@@ -75,7 +75,7 @@ namespace Jobs {
             // Debug.Log($"Sorting took {stopwatch.ElapsedMilliseconds}ms");
             stopwatch.Restart();
 
-            var regions = new NativeList<AssemblyStepArgs>(Allocator.TempJob);
+            var regions = new NativeList<AssemblyStepArgs>(Allocator.Persistent);
             regions.Add(new AssemblyStepArgs {
                 start = 0,
                 end = xyz.Length,

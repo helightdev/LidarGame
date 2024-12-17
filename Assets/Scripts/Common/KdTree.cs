@@ -68,12 +68,13 @@ namespace Common {
         }
 
         private void Insert(int nodeIndex, int pointIndex, int depth) {
+            var newPoint = points[pointIndex];
+            var targetPosition = newPoint.position;
             var axis = depth % 3;
             while (true) {
                 var node = nodes[nodeIndex];
                 var nodePoint = points[node.PointIndex];
-                var newPoint = points[pointIndex];
-                if (ComparePoints(newPoint.position, nodePoint.position, axis) < 0) {
+                if (ComparePoints(targetPosition, nodePoint.position, axis) < 0) {
                     if (node.Left == -1) {
                         node.Left = nodes.Length;
                         nodes[nodeIndex] = node;
@@ -179,11 +180,28 @@ namespace Common {
             GetDepths(node.Right, currentDepth + 1, ref totalDepth, ref nodeCount);
         }
     }
-
+    
     [StructLayout(LayoutKind.Sequential)]
-    public struct PointData {
+    public struct PointData : IHasPosition, IEquatable<PointData> {
         public float3 position;
         public float3 color;
         public float timestamp;
+        public float3 GetPosition() => position;
+
+        public bool Equals(PointData other) {
+            return position.Equals(other.position);
+        }
+
+        public override bool Equals(object obj) {
+            return obj is PointData other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            return position.GetHashCode();
+        }
+    }
+    
+    public interface IHasPosition {
+        float3 GetPosition();
     }
 }

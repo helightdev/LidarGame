@@ -12,17 +12,26 @@ namespace Jobs {
         public KdTree tree;
 
         public void Execute() {
+            using var addedBuffer = new NativeList<float3>(Allocator.Temp);
             foreach (var d in data)
                 if (d.isUpdate) {
                     var point = tree.points[d.updateIndex];
                     point.timestamp = d.timestamp;
                     tree.points[d.updateIndex] = point;
                 } else {
+                    var pos = d.position;
+                    foreach (var p in addedBuffer) {
+                        if (math.distance(pos, p) < d.density) {
+                            goto skip;
+                        }
+                    }
                     tree.Insert(new PointData {
-                        position = d.position,
+                        position = pos,
                         color = d.color,
                         timestamp = d.timestamp
                     });
+                    addedBuffer.Add(pos);
+                    skip:{}
                 }
         }
     }

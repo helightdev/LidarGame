@@ -1,4 +1,5 @@
 using Common;
+using Storage;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -27,12 +28,12 @@ namespace Jobs {
             var cursor = 0;
             var bounds = new MinMaxAABB();
 
-            var iter = tree.TraverseLeftToRightIterative(Allocator.Temp);
-            foreach (var point in iter) {
-                if (cursor == PointRenderContainer.TEXTURE_2D_MAX_HEIGHT) {
+            //var iter = tree.TraverseLeftToRightIterative(Allocator.Temp);
+            foreach (var point in tree.points) {
+                if (cursor == StaticGeometryStorageBase.TEXTURE_2D_MAX_HEIGHT) {
                     entries[currentIndex] = new PointRenderEntry {
                         data = currentEntry.data,
-                        count = PointRenderContainer.TEXTURE_2D_MAX_HEIGHT,
+                        count = StaticGeometryStorageBase.TEXTURE_2D_MAX_HEIGHT,
                         bounds = bounds
                     };
                     currentIndex++;
@@ -46,12 +47,12 @@ namespace Jobs {
                     bounds.Encapsulate(point.position);
 
                 currentEntry.data[cursor] = new float4(point.position, 1f);
-                currentEntry.data[cursor + PointRenderContainer.TEXTURE_2D_MAX_HEIGHT] =
+                currentEntry.data[cursor + StaticGeometryStorageBase.TEXTURE_2D_MAX_HEIGHT] =
                     new float4(point.color, point.timestamp);
                 cursor++;
             }
 
-            iter.Dispose();
+            //iter.Dispose();
 
             if (cursor > 0)
                 entries[currentIndex] = new PointRenderEntry {
